@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es2015",
+    "module": "CommonJS",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "declaration": true,
+    "outDir": "dist",
+    "lib": ["es2017", "dom"]
+  },
+  "exclude": ["node_modules", "__tests__/*.test.ts"]
+}
