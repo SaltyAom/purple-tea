@@ -98,7 +98,7 @@ export default !isServer
           subscribe(name: string, callback: Function): void {
               validate(name, this.event)
 
-              this.addEventListener(name, callback(this.store[name]))
+              this.addEventListener(name, () => callback(this.store[name]))
           }
       }
     : class Preload {

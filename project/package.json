@@ -1,6 +1,6 @@
 {
     "name": "purple-tea",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "description": "Light-weight state container for JavaScript app",
     "main": "index.js",
     "license": "MIT",
