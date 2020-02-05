@@ -48,7 +48,7 @@ export default !isServer
            * @param {string} name - Store Name
            * @returns {object} Storage value
            */
-          get(name: string): Object {
+          get(name: string): any {
               validate(name, this.event)
               return Object.freeze(this.store[name])
           }
@@ -60,7 +60,7 @@ export default !isServer
            * @param {object} value - Value to change or update
            * @returns {object} Storage value
            */
-          set(name: string, value: Object): Object {
+          set(name: string, value: Object): any {
               validate(name, this.event)
 
               let event = this.event[name]
@@ -78,7 +78,7 @@ export default !isServer
            * @param {object} value - Value to change or update
            * @returns {object} Storage value
            */
-          update(name: string, value: Object): Object {
+          update(name: string, value: Object): any {
               validate(name, this.event)
 
               let event = this.event[name]
@@ -116,7 +116,7 @@ export default !isServer
            * @param {string} name - Store Name
            * @returns {object} Storage value
            */
-          get(name: string): Object { return {} }
+          get(name: string): any { return {} }
 
           /**
            * Set store.
@@ -125,7 +125,7 @@ export default !isServer
            * @param {object} value - Value to change or update
            * @returns {object} Storage value
            */
-          set(name: string, value: Object): Object { return {} }
+          set(name: string, value: Object): any { return {} }
 
           /**
            * Update store.
@@ -134,7 +134,7 @@ export default !isServer
            * @param {object} value - Value to change or update
            * @returns {object} Storage value
            */
-          update(name: string, value: Object): Object { return {} }
+          update(name: string, value: Object): any { return {} }
 
           /**
            * Subscribe store.
