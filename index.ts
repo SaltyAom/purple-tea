@@ -18,7 +18,7 @@ const validate = (type: string, event: PurpleTeaEventStore) => {
 export default !isServer
   ? class PurpleTea extends EventTarget {
       event: { [key: string]: PurpleTeaEvent };
-      store: { [key: string]: Object };
+      store: { [key: string]: any };
 
       constructor() {
         super();
@@ -33,13 +33,13 @@ export default !isServer
        * @param {string} name - Store Name
        * @param {object} initStore - Initial storage value
        */
-      add(name: string, initStore = {}) {
+      add<T = Object>(name: string, initStore?: T) {
         if (typeof this.store[name] !== "undefined" && !isProduction)
           throw `${name} is already existed.`;
 
         this.event[name] = new Event(name);
-        this.store[name] = initStore;
-        return initStore;
+        this.store[name] = initStore || {};
+        return initStore || {};
       }
 
       /**
@@ -57,7 +57,7 @@ export default !isServer
        * @param {string} name - Store Name
        * @param {object} value - Value to change or update
        */
-      set(name: string, value: Object) {
+      set<T = Object>(name: string, value: T) {
         validate(name, this.event);
 
         let event = this.event[name];
@@ -74,7 +74,7 @@ export default !isServer
        * @param {string} name - Store Name
        * @param {object} value - Value to change or update
        */
-      update(name: string, value: Object) {
+      update<T = Object>(name: string, value: T) {
         validate(name, this.event);
 
         let event = this.event[name];
@@ -91,7 +91,7 @@ export default !isServer
        * @param {string} name - Store Name
        * @param {object} initStore - Initial storage value
        */
-      subscribe(name: string, callback: Function) {
+      subscribe<T = Object>(name: string, callback: (value: T) => EventListenerOrEventListenerObject) {
         validate(name, this.event);
 
         return this.addEventListener(name, callback(this.store[name]));
@@ -104,7 +104,7 @@ export default !isServer
        * @param {string} name - Store Name
        * @param {object} initStore - Initial storage value
        */
-      add(name: string, initStore = {}) {}
+      add<T = Object>(name: string, initStore?: T) {}
 
       /**
        * Get existing store value with given store name.
@@ -118,7 +118,7 @@ export default !isServer
        * @param {string} name - Store Name
        * @param {object} value - Value to change or update
        */
-      set(name: string, value: Object) {}
+      set<T = Object>(name: string, value: T) {}
 
       /**
        * Update store.
@@ -126,7 +126,7 @@ export default !isServer
        * @param {string} name - Store Name
        * @param {object} value - Value to change or update
        */
-      update(name: string, value: Object) {}
+      update<T = Object>(name: string, value: T) {}
 
       /**
        * Subscribe store.
@@ -134,5 +134,5 @@ export default !isServer
        * @param {string} name - Store Name
        * @param {object} initStore - Initial storage value
        */
-      subscribe(name: string, callback: Function) {}
+      subscribe<T = Object>(name: string, callback: (value: T) => EventListenerOrEventListenerObject) {}
     };
