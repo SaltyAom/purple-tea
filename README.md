@@ -98,10 +98,31 @@ let tea = new Store()
 
 tea.add("sugar", { amount: 0 })
 
-// Trigger when update() is called.
+// Trigger when store is updated.
 tea.subscribe("sugar", data => {
     console.log(data) // Get current value of sugar. eg. { amount: 1 }
 })
 
 tea.update("sugar", { amount: 1 })
+
+// Support multiple listener at once.
+tea.subscribe(["sugar", "milk"], data => {
+    console.log(data) // Get current value of sugar. eg. { amount: 1 }
+})
+```
+
+## Middleware
+A function which invoked before operation succeed.
+Mutate store data is recommended here.
+```javascript
+import Store from "./purple.ts"
+
+let tea = new Store()
+
+tea.applyMiddleware((store, process) => {
+  console.log(store, `Process: ${process}`) // { amount: 0 } Process: add
+  return store
+})
+
+tea.add("sugar", { amount: 0 })
 ```
