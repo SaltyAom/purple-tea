@@ -6,18 +6,14 @@ interface PurpleTeaEvent extends Event {
 
 type PurpleTeaProcess = "create" | "get" | "update" | "set" | "subscribe"
 
-const isProduction = process.env.NODE_ENV === "production",
-    isServer = typeof window === "undefined"
-
 const validate = (type: string, event: PurpleTeaEventStore) => {
-    if (isProduction) return
     if (!type) throw "type is required."
     if (typeof type !== "string") throw "type must be string."
     if (typeof event[type] === "undefined")
         throw `Store: ${type} isn't existed. Please create it with create("${type}")`
 }
 
-export default !isServer
+export default typeof window !== "undefined"
     ? class PurpleTea extends EventTarget {
           event: { [key: string]: PurpleTeaEvent }
           store: { [key: string]: any }
@@ -38,8 +34,8 @@ export default !isServer
            * @param {object} initStore - Initial storage value
            * @returns {object} Storage value - Return any due to middleware.
            */
-          create<T = Object>(name: string, initStore?: T): any {
-              if (typeof this.store[name] !== "undefined" && !isProduction)
+          create<T = Object>(name: string, initStore: T): any {
+              if (typeof this.store[name] !== "undefined")
                   throw `${name} is already existed.`
 
               this.event[name] = new Event(name)
@@ -159,10 +155,7 @@ export default !isServer
               }> = []
               Object.entries(this.store).map(([name, store]) => {
                   storeList.push(
-                      JSON.parse(`{
-                    "name": "${name}",
-                    "store": ${JSON.stringify(store)}
-                }`)
+                      JSON.parse(`{"name":"${name}","store":${JSON.stringify(store)}}`)
                   )
               })
               return storeList
@@ -224,7 +217,7 @@ export default !isServer
            * @param {object} initStore - Initial storage value
            * @returns {object} Storage value
            */
-          create<T = Object>(name: string, initStore?: T): any {
+          create<T = Object>(name: string, initStore: T): any {
               return initStore
           }
 

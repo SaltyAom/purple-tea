@@ -1,6 +1,6 @@
 {
     "name": "purple-tea",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "description": "Light-speed and feather-weight state container for JavaScript app",
     "main": "index.js",
     "types": "index.d.ts",

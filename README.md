@@ -6,12 +6,14 @@ Purple Tea is very light-weight state container for JavaScript app. It contain s
 Purple tea is inspired by Redux but with only a simple and handy logic. Under the hood, it use a simple collection of JavaScript API which supported since IE 9.
   
   Purple Tea feature:
-  * A very light-weight storage: 0.5 KB (gzipped)
+  * A very light-weight storage: 0.6KB (gzipped).
+  * Very high performance operation.
+  * Middleware support.
   * Readable error message, easier to debug.
-  * Redux syntax like but simpler
-  * Subscribe to storage.
+  * As simple as LocalStorage.
+  * Get realtime storage change.
   * TypeScript support.
-  * Support on every browser even IE11.
+  * Support on every browser even IE 10.
 
 ## Readable error
 One thing people most hate about, `unreadable error` by human. It's very annoying yet not productive to anyone.  
