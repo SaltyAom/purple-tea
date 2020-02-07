@@ -4,7 +4,7 @@ interface PurpleTeaEvent extends Event {
     detail?: any
 }
 
-type PurpleTeaProcess = "add" | "get" | "update" | "set" | "subscribe"
+type PurpleTeaProcess = "create" | "get" | "update" | "set" | "subscribe"
 
 const isProduction = process.env.NODE_ENV === "production",
     isServer = typeof window === "undefined"
@@ -14,13 +14,13 @@ const validate = (type: string, event: PurpleTeaEventStore) => {
     if (!type) throw "type is required."
     if (typeof type !== "string") throw "type must be string."
     if (typeof event[type] === "undefined")
-        throw `Store: ${type} isn't existed. Please create it with add("${type}")`
+        throw `Store: ${type} isn't existed. Please create it with create("${type}")`
 }
 
 export default !isServer
     ? class PurpleTea extends EventTarget {
           event: { [key: string]: PurpleTeaEvent }
-          store: { [key: string]: Object }
+          store: { [key: string]: any }
           middleware: Function[]
 
           constructor() {
@@ -36,15 +36,15 @@ export default !isServer
            * Create a collection of storage which can be used in various collection
            * @param {string} name - Store Name
            * @param {object} initStore - Initial storage value
-           * @returns {object} Storage value
+           * @returns {object} Storage value - Return any due to middleware.
            */
-          add<T>(name: string, initStore: T): T {
+          create<T = Object>(name: string, initStore?: T): any {
               if (typeof this.store[name] !== "undefined" && !isProduction)
                   throw `${name} is already existed.`
 
               this.event[name] = new Event(name)
-              this.store[name] = this.useMiddleware(initStore, "add")
-              return initStore
+              this.store[name] = this.useMiddleware(initStore || {}, "create")
+              return this.store[name]
           }
 
           /**
@@ -64,9 +64,9 @@ export default !isServer
            * @param {object} value - Value to change or update
            * @returns {object} Storage value
            */
-          set(
+          set<T = Object>(
               name: string,
-              value: Object
+              value: T
           ): PurpleTea["store"][keyof PurpleTea["store"]] {
               validate(name, this.event)
 
@@ -85,9 +85,9 @@ export default !isServer
            * @param {object} value - Value to change or update
            * @returns {object} Storage value
            */
-          update(
+          update<T = Object>(
               name: string,
-              value: Object
+              value: T
           ): PurpleTea["store"][keyof PurpleTea["store"]] {
               validate(name, this.event)
 
@@ -111,35 +111,21 @@ export default !isServer
            * @param {string|string[]} name - Store Name
            * @param {object} initStore - Initial storage value
            */
-          subscribe(
+          subscribe<T = Object>(
               name: string | string[],
-              callback: Function
+              callback: (value: T) => EventListenerOrEventListenerObject
           ): void {
-              if (typeof name !== "string")
-                  return name.forEach(eachName => {
-                      validate(eachName, this.event)
+              if (typeof name === "string") name = new Array(name)
 
-                      return this.addEventListener(eachName, () =>
-                          callback(
-                              this.useMiddleware(
-                                  this.store[eachName],
-                                  "subscribe"
-                              )
-                          )
-                      )
-                  })
+              name.forEach(eachName => {
+                  validate(eachName, this.event)
 
-              validate(name, this.event)
-              return this.addEventListener(
-                  name,
-                  () =>
+                  return this.addEventListener(eachName, () =>
                       callback(
-                          this.useMiddleware(
-                              this.store[name],
-                              "subscribe"
-                          )
+                          this.useMiddleware(this.store[eachName], "subscribe")
                       )
-              )
+                  )
+              })
           }
 
           /**
@@ -169,7 +155,7 @@ export default !isServer
            * Use middleware in an internal storage.
            * @private
            * @param @readonly store - Collection of existing store.
-           * @param {"add" | "get" | "update" | "set" | "subscribe"} process - Process name which flow through middleware.
+           * @param { "create" | "get" | "update" | "set" | "subscribe"} process - Process name which flow through middleware.
            */
           private useMiddleware(
               store: PurpleTea["store"][keyof PurpleTea["store"]] = this.store,
@@ -185,7 +171,12 @@ export default !isServer
       }
     : class PurpleTea {
           event: { [key: string]: PurpleTeaEvent }
-          store: { [key: string]: Object }
+          store: { [key: string]: any }
+
+          constructor() {
+              this.event = {}
+              this.store = {}
+          }
           /**
            * Create store.
            * Create a collection of storage which can be used in various collection
@@ -193,7 +184,7 @@ export default !isServer
            * @param {object} initStore - Initial storage value
            * @returns {object} Storage value
            */
-          add<T>(name: string, initStore: T): T {
+          create<T = Object>(name: string, initStore?: T): any {
               return initStore
           }
 
@@ -213,9 +204,9 @@ export default !isServer
            * @param {object} value - Value to change or update
            * @returns {object} Storage value
            */
-          set(
+          set<T = Object>(
               name: string,
-              value: Object
+              value: T
           ): PurpleTea["store"][keyof PurpleTea["store"]] {
               return {}
           }
@@ -227,12 +218,20 @@ export default !isServer
            * @param {object} value - Value to change or update
            * @returns {object} Storage value
            */
-          update(
+          update<T = Object>(
               name: string,
-              value: Object
+              value: T
           ): PurpleTea["store"][keyof PurpleTea["store"]] {
               return {}
           }
+
+          /**
+           *
+           * Middleware callback
+           * @callback MiddlewareCallback
+           * @param store - Collection of existing store.
+           * @param process - Process name which flow through middleware.
+           */
 
           /**
            * Subscribe store.
@@ -240,26 +239,8 @@ export default !isServer
            * @param {string|string[]} name - Store Name
            * @param {object} initStore - Initial storage value
            */
-          subscribe(name: string | string[], callback: Function): void {}
-
-          /**
-           * Middleware callback
-           *
-           * @callback MiddlewareCallback
-           * @param store - Collection of existing store.
-           * @param process - Process name which flow through middleware.
-           */
-
-          /**
-           * Add middleware to store.
-           * @param {MiddlewareCallback} callback - Callback function to manipulate data from middleware.
-           */
-          applyMiddleware(
-              ...callbacks: Array<
-                  (
-                      store: PurpleTea["store"],
-                      process: PurpleTeaProcess
-                  ) => PurpleTea["store"]
-              >
-          ): void {}
+          subscribe<T = Object>(
+              name: string | string[],
+              callback: (value: T) => EventListenerOrEventListenerObject
+          ) {}
       }
