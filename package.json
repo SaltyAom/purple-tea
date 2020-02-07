@@ -1,14 +1,16 @@
 {
     "name": "purple-tea",
-    "version": "0.1.0",
-    "description": "Light-weight state container for JavaScript app",
+    "version": "0.3.0",
+    "description": "Light-speed and feather-weight state container for JavaScript app",
+    "license": "MIT",
     "main": "dist/",
     "types": "dist/",
     "dependencies": {},
     "scripts": {
-        "build": "yarn build:ts && yarn build:compress",
+        "build": "yarn build:ts && yarn build:compress && yarn build:size",
         "build:ts": "tsc",
         "build:compress": "terser dist/index.js -o dist/index.js --compress --mangle",
+        "build:size": "cd dist && ls -lh",
         "prepublish": "yarn build"
     },
     "devDependencies": {
