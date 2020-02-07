@@ -113,7 +113,7 @@ export default !isServer
            */
           subscribe<T = Object>(
               name: string | string[],
-              callback: (value: T) => EventListenerOrEventListenerObject
+              callback: (value: T) => void
           ): void {
               if (typeof name === "string") name = new Array(name)
 
@@ -126,6 +126,46 @@ export default !isServer
                       )
                   )
               })
+          }
+
+          /**
+           * Get every store name.
+           * @returns {string} name - Store's name.
+           * @returns {object} store - Store's value.
+           */
+          list(): Array<keyof PurpleTea["store"]> {
+              return Object.keys(this.store)
+          }
+
+          /**
+           * Single store model
+           * @typedef StoreModel
+           * @type {object}
+           * @returns {string} name - Store's name.
+           * @returns {object} store - Store's value.
+           */
+
+          /**
+           * Retreive every store collection's model.
+           * @returns {StoreModel[]} - Collection of store's model
+           */
+          model(): Array<{
+              name: keyof PurpleTea["store"]
+              store: PurpleTea["store"][keyof PurpleTea["store"]]
+          }> {
+              let storeList: Array<{
+                  name: keyof PurpleTea["store"]
+                  store: PurpleTea["store"][keyof PurpleTea["store"]]
+              }> = []
+              Object.entries(this.store).map(([name, store]) => {
+                  storeList.push(
+                      JSON.parse(`{
+                    "name": "${name}",
+                    "store": ${JSON.stringify(store)}
+                }`)
+                  )
+              })
+              return storeList
           }
 
           /**
@@ -241,6 +281,33 @@ export default !isServer
            */
           subscribe<T = Object>(
               name: string | string[],
-              callback: (value: T) => EventListenerOrEventListenerObject
+              callback: (value: T) => void
           ) {}
+
+          /**
+           * Get every store name.
+           * @returns {string[]} name - Store's name.
+           */
+          list(): Array<keyof PurpleTea["store"]> {
+              return []
+          }
+
+          /**
+           * Single store model
+           * @typedef StoreModel
+           * @type {object}
+           * @returns {string} name - Store's name.
+           * @returns {object} store - Store's value.
+           */
+
+          /**
+           * Retreive every store collection's model.
+           * @returns {StoreModel[]} Store Model - Collection of store's model
+           */
+          model(): Array<{
+              name: keyof PurpleTea["store"]
+              store: PurpleTea["store"][keyof PurpleTea["store"]]
+          }> {
+              return []
+          }
       }
